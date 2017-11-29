@@ -1,0 +1,4 @@
+# RR-Project-2-NOAA
+
+
+This report has been created for the purposes of completing an end-of-module project for the Reproducible Research Course offered by the Johns Hopkins School Of Public Health on Coursera. For the purposes of the assignment, storm data from the U.S. National Oceanic and Atmospheric Administration (NOAA) [Website](https://www.ncdc.noaa.gov/stormevents/) was analysed to ascertain the public health and financial impact of natural disasters in the US. From NOAA's website, "the database contains storm data from January 1950 [to date] as entered by NOAA's National Weather Service (NWS)". The report was required to be created for the purposes of de-briefing government officials responsible for preparing severe weather events and the report format(html) was required to be uploaded on Rpubs.
