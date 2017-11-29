@@ -1,14 +1,14 @@
-# Public Health and Financial Impact of Natural Disasters in the US
+# Public Health, and Financial, Impact of Natural Disasters in the US
 Dr. Vivek Narayan  
 November 28, 2017  
 
 
 
 ###Synopsis
-This report has been created for the purposes of completing an end-of-module project for the Reproducible Research Course offered by the Johns Hopkins School Of Public Health on Coursera. For the purposes of the assignment, storm data from the U.S. National Oceanic and Atmospheric Administration (NOAA) [Link](https://www.ncdc.noaa.gov/stormevents/) was analysed to ascertain the public health and financial impact of natural disasters in the US. From NOAA's website, "the database contains storm data from January 1950 [to date] as entered by NOAA's National Weather Service (NWS)". The report was required to be created for the purposes of de-briefing government officials responsible for preparing severe weather events and the report format(html) was required to be uploaded on Rpubs.
+This report has been created for the purposes of completing an end-of-module project for the Reproducible Research Course offered by the Johns Hopkins Bloomberg School Of Public Health on Coursera. For the purposes of the assignment, storm data from the U.S. National Oceanic and Atmospheric Administration (NOAA) [Website](https://www.ncdc.noaa.gov/stormevents/) was analysed to ascertain the public health and financial impact of natural disasters in the US. From NOAA's website, "the database contains storm data from January 1950 [to date] as entered by NOAA's National Weather Service (NWS)". The report was required to be created for the purposes of de-briefing government officials responsible for preparing for severe weather events and the report format(html) was required to be uploaded on [Rpubs](https://rpubs.com/).
 
 ###Loading and Processing Data
-For the purposes of the assignment data was downloaded from provided URL [link](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2)
+For the purposes of the assignment data was downloaded from the assignment provided URL [Link](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2).
 
 
 ```r
@@ -26,9 +26,9 @@ if(!exists("rawData")){
   }
 ```
 
-The function str() was used to identify the column names required for analysis in conjunction with the database documentation from the NOAA website.
+After loading the data into the local evironment, the function str() was used to identify the column names required for analysis in conjunction with the database documentation from the NOAA website (see supplemental material).
 
-A following subsets of data were created for the purposes of analysis:
+The following subsets of data were created for the purposes of analysis:
 
 - Public Health Impact
 
@@ -36,7 +36,7 @@ A following subsets of data were created for the purposes of analysis:
 
 #####Public Health Impact containing Event-type, Fatalities and Injuries
 
-It was decided to separate injuries and fatalities as while fatalities and injuries both need prevention, prevented fatalities potentially become injuries, and injuries, require resources to manage and treat.
+While fatalities and injuries both need prevention, injuries, require resources to manage and treat. Summing up the two obscures the respective impacts, hence, it was decided to present injuries and fatalities separately. 
 
 
 ```r
@@ -77,14 +77,14 @@ unique(FinSubsetData$CROPDMGEXP)
 ## Levels:  ? 0 2 B k K m M
 ```
 
-Per NOAA documentation column headings "CROPDMGEXP" and "PROPDMGEXP" modify the columns "CROPDMG" and "PROPDMG" by using "B", "M", and "K" to denote figures in Billions, Millions, and Thousands, respectively. For the purposes of this analysis, column entries not strictly denoted with "B", "b", "M", "m", "K", or "k" were dropped. Further more, character notations were substituted with numerical values to aid in computation of the financial impact using gsub(). Finally, three separate subsets were created to convey the results of the analysis. Given that some authorities would be more concerned about crop damage v property damage, it was decided to present those data separately.
+Per NOAA documentation (see supplemental material for link) column headings "CROPDMGEXP" and "PROPDMGEXP" modify the columns "CROPDMG" and "PROPDMG" by using "B", "M", and "K" to denote figures in Billions, Millions, and Thousands, respectively. For the purposes of this analysis, column entries not strictly denoted with "B", "b", "M", "m", "K", or "k" were dropped. Further more, character notations were substituted with numerical values to aid in computation of the financial impact using gsub(). Finally, three separate subsets were created to convey the results of the analysis. Given that some authorities would be more concerned about crop damage vs. property damage, it was decided to present those data separately.
 
 
 ```r
 FinSubsetData <- FinSubsetData %>%
   filter(!(PROPDMGEXP %in% (c("-", "+", "?", "", "0", "5", "3")))) %>%
   filter(!(CROPDMGEXP %in% (c("-", "+", "?", "", "0"))))
-##Function to change the damage suffix to numerical amounts (in Thousands)
+##Function to change the damage suffix to numerical amounts
 SufFun <- function(char){
   char <- as.character(char);
   char <- gsub("m|M", 1000000, char);
@@ -94,7 +94,7 @@ SufFun <- function(char){
 }
 FinSubsetData$CROPDMGEXP <- SufFun(FinSubsetData$CROPDMGEXP)
 FinSubsetData$PROPDMGEXP <- SufFun(FinSubsetData$PROPDMGEXP)
-##Total Financial Impact
+##Total Financial Impact in Billions
 SumFinImpact <- FinSubsetData %>% 
   mutate(Cost = (CROPDMG*CROPDMGEXP) + (PROPDMG*PROPDMGEXP)) %>%
   group_by(EVTYPE) %>% 
@@ -103,7 +103,7 @@ SumFinImpact <- FinSubsetData %>%
   arrange(desc(Cost)) %>%
   top_n(15, Cost)
 SumFinImpact$Cost <- round(SumFinImpact$Cost, digits = 2)
-##Property Damage
+##Property Damage in Billions
 PropDamage <- FinSubsetData %>%
   select(EVTYPE, PROPDMG, PROPDMGEXP) %>%
   mutate(Cost = PROPDMG*PROPDMGEXP) %>%
@@ -142,6 +142,8 @@ barplot(TopPHIssues$INJURIES, las=2, horiz = T, main = "Injuries (in 1000's)", x
 
 ![](RR_Project_2_-_Public_Health_and_Financial_Impact_of_Natural_Disasters_Using_NOAA_Data_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
+As can be seen from the chart, Tornadoes, Excessive Heat, and, Flooding are a great threat to public health.
+
 ###Financial Impact Due to Crop and Property Damage
 
 The following bar-charts were created to visualize the events that result in the most (top-ten) financial loss due to severe weather.
@@ -157,14 +159,28 @@ barplot(CropDamage$Cost, names.arg = CropDamage$EVTYPE, las=2, horiz = T, main =
 
 ![](RR_Project_2_-_Public_Health_and_Financial_Impact_of_Natural_Disasters_Using_NOAA_Data_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-Additionally, the following bar-chart was created to visualize the overall financial impact from severe weather.
+As can be seen from the chart, the top causes for crop damage are adverse weather events, such as, Frost, Drought, Hurricanes, and, Floods.
+
+Flooding constitutes the main cause for property damage, followed by, Hurricanes and Tornadoes.
+
+Additionally, the following bar-chart was created to visualize the overall financial impact from severe weather. 
 
 
 ```r
 par(mfrow = c(1,1))
 par(mar = c(5,14,5,2))
-barplot(SumFinImpact$Cost, names.arg = SumFinImpact$EVTYPE, las=2, horiz = T, main = "Top 15 Costliest Forms of Natural Disasters (NOAA Data)", xlim = c(0,150), col = "Coral", sub = "Cost in Billions")
+barplot(SumFinImpact$Cost, names.arg = SumFinImpact$EVTYPE, las=2, horiz = T, main = "Top 15 Costliest Forms of Natural Disasters (NOAA Data)", xlim = c(0,150), col = "Orange", sub = "Cost in Billions")
 ```
 
 ![](RR_Project_2_-_Public_Health_and_Financial_Impact_of_Natural_Disasters_Using_NOAA_Data_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
+As can be seen from the chart, Flooding is a major cause for both crop and property damage.
+
+***
+
+##Suplemental Material
+All files (minus the original data) and code have been uploaded onto Github [Link](https://github.com/maximegalon5/RR-Project-2-NOAA-Data)
+
+Documentation for the Storm-data database can be sourced directly from NOAA's website [Link](http://www.nws.noaa.gov/directives/sym/pd01016005curr.pdf)
+
+For more information on the Reproducible Research course offered by the Johns Hopkins Bloomberg School of Public Health on Coursera visit the course homepage at [Link](https://www.coursera.org/learn/reproducible-research/home/welcome)
