@@ -189,6 +189,7 @@ unique(FinSubsetData$PROPDMGEXP)</code></pre>
 ##Function to change the damage suffix to numerical amounts
 SufFun &lt;- function(char){
   char &lt;- as.character(char);
+  char &lt;- gsub(&quot;h|H&quot;, 100, char);
   char &lt;- gsub(&quot;m|M&quot;, 1000000, char);
   char &lt;- gsub(&quot;b|B&quot;, 1000000000, char);
   char &lt;- gsub(&quot;k|K&quot;, 1000, char);

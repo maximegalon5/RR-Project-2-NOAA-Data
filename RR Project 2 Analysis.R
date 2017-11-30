@@ -32,6 +32,7 @@ FinSubsetData <- rawData %>% select(EVTYPE, PROPDMG, PROPDMGEXP, CROPDMG, CROPDM
 ##Function to change the damage suffix to numerical amounts (in Thousands)
 SufFun <- function(char){
   char <- as.character(char);
+  char <- gsub("h|H", 100, char);
   char <- gsub("m|M", 1000000, char);
   char <- gsub("b|B", 1000000000, char);
   char <- gsub("k|K", 1000, char);
